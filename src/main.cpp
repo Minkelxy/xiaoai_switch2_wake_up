@@ -46,13 +46,13 @@ char bafa_topic_buf[33] = "";
 char ble_mac_buf[19] = "";
 char ble_data_buf[65] = "";
 
-// 默认值（仅用于首次 fallback）
-const char* DEFAULT_BAFA_UID = "your_bafa_uid_here";
-const char* DEFAULT_BAFA_TOPIC = "your_bafa_topic_here";
-const char* DEFAULT_BLE_MAC = "78:81:8c:06:9a:c4";
-const char* DEFAULT_BLE_DATA = "0201061BFF53050100037E0566200001816D60168C81780F00000000000000";
+const char* DEFAULT_BAFA_UID = "98873b5ca43046cea88fa3b9ed51ef9b";
 
+const char* DEFAULT_BAFA_TOPIC = "switch001";
 
+const char* DEFAULT_BLE_MAC = "78:81:8c:05:0f:fa";
+
+const char* DEFAULT_BLE_DATA = "0201061BFF53050100037E0566200001810917158C81780F00000000000000";
 
 // BLE相关变量
 BLEAdvertising *pAdvertising;
@@ -72,7 +72,7 @@ static uint8_t wake_adv_data[] = {
     // Payload (26 bytes)
     0x53, 0x05, 0x01, 0x00, 0x03, 0x7e, 0x05, 0x66, 0x20, 0x00, 0x01, 0x81,
     // Host address (6 bytes, will be filled at runtime in reverse order)
-    0x6D, 0x60, 0x16, 0x8C, 0x81, 0x78,
+    0x09, 0x17, 0x15, 0x8C, 0x81, 0x80,
     // Remaining bytes
     0x0f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
@@ -707,9 +707,18 @@ void startBLEAdvertising() {
   // 创建广播数据
   BLEAdvertisementData oAdvertisementData = BLEAdvertisementData();
   
-  // 使用预定义的wake_adv_data数组作为原始广播数据
-  std::string advertDataString(reinterpret_cast<char*>(wake_adv_data), sizeof(wake_adv_data));
-  oAdvertisementData.addData(advertDataString);
+  // 检查是否有配置的广播数据，如果有则使用配置的数据，否则使用默认的wake_adv_data
+  if (strlen(ble_data_buf) > 0) {
+    // 使用配置的十六进制字符串数据
+    std::string hexData = hexToBytes(String(ble_data_buf));
+    oAdvertisementData.addData(hexData);
+    Serial.println("BLE Beacon started with configured data: " + String(ble_data_buf));
+  } else {
+    // 使用预定义的wake_adv_data数组作为原始广播数据
+    std::string advertDataString(reinterpret_cast<char*>(wake_adv_data), sizeof(wake_adv_data));
+    oAdvertisementData.addData(advertDataString);
+    Serial.println("BLE Beacon started with predefined data...");
+  }
 
   // 设置广播数据
   pAdvertising->setAdvertisementData(oAdvertisementData);
@@ -719,8 +728,6 @@ void startBLEAdvertising() {
   
   // 记录广播开始时间
   bleAdvertisingStart = millis();
-  
-  Serial.println("BLE Beacon started with predefined data...");
 }
 
 // 停止BLE广播
