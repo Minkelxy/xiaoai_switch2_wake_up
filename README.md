@@ -2,6 +2,24 @@
 
 这是一个基于ESP32的智能开关项目，可以通过WiFi连接到巴法云(Bemfa Cloud)，实现远程控制LED灯的功能，并支持通过BLE广播唤醒小米AI音箱。
 
+
+## 常见问题
+- Bafa User ID: 在巴法云平台获取的UID
+- Bafa Topic: 创建的主题名称
+- BLE Device MAC: 自定义BLE MAC地址
+- BLE Adv Data: BLE广播数据
+一共四个配置参数，唤醒不了通常就是参数不对，bafa云的网上有博客，我不再赘述，BLE这里，使用手机的BLE助手可以看见地址和报文。复制进去就可以，
+填写建议修改代码里的
+```c
+const char* DEFAULT_BAFA_UID = "98873b5ca43046cea88fa3b9ed51ef9b";
+
+const char* DEFAULT_BAFA_TOPIC = "switch001";
+
+const char* DEFAULT_BLE_MAC = "78:81:8c:05:0f:fa";
+
+const char* DEFAULT_BLE_DATA = "0201061BFF53050100037E0566200001810917158C81780F00000000000000";
+```
+没有调试经验的尝试用web配置吧,程序没怎么实验过,有问题可以点我一下
 ## 功能特点
 
 - WiFi自动连接与配置门户
